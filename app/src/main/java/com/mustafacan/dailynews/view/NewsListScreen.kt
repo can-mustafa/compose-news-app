@@ -1,5 +1,7 @@
 package com.mustafacan.dailynews.view
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -190,16 +192,27 @@ fun HyperlinkText(
     }
 
     val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
 
     ClickableText(
         modifier = modifier,
         text = annotatedString,
         onClick = {
-            annotatedString
-                .getStringAnnotations("URL", it, it)
-                .firstOrNull()?.let { stringAnnotation ->
-                    uriHandler.openUri(stringAnnotation.item)
+            try {
+                annotatedString
+                    .getStringAnnotations("URL", it, it)
+                    .firstOrNull()?.let { stringAnnotation ->
+                        uriHandler.openUri(stringAnnotation.item)
+                    } ?: run {
+                    mToast(context)
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     )
+}
+
+private fun mToast(context: Context) {
+    Toast.makeText(context, "Error!", Toast.LENGTH_SHORT).show()
 }
